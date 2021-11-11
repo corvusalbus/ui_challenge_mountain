@@ -33,15 +33,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late AnimationController animationController;
-  late AnimationController reverseController;
+  //late AnimationController reverseController;
 
   @override
   void initState() {
     super.initState();
 
-    reverseController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 250));
-    reverseController.addListener(() => setState(() {}));
+    // reverseController =
+    //     AnimationController(vsync: this, duration: Duration(milliseconds: 250));
+    // reverseController.addListener(() => setState(() {}));
 
     animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 250));
@@ -112,11 +112,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         child: Transform(
                             alignment: Alignment.center,
                             transform: Matrix4.identity()
-                              ..translate(
-                                  slideX +
-                                      (mountains[(2 + index) % 3].translateX -
-                                          2 * maxSlide),
-                                  0)
+                              ..translate(slideX + -2 * maxSlide, 0)
                               ..scale(1.0),
                             child: mountains[(2 + index) % 3])),
                   ),
@@ -127,13 +123,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         child: Transform(
                             alignment: Alignment.center,
                             transform: Matrix4.identity()
-                              ..translate(
-                                  slideX +
-                                      (mountains[(1 + index) % 3].translateX -
-                                          maxSlide),
-                                  0)
+                              ..translate(slideX - maxSlide, 0)
                               ..scale(1.0),
                             child: mountains[(1 + index) % 3])),
+                  ),
+                  Opacity(
+                    opacity: opacities[0],
+                    child: Container(
+                      color: mountains[index % 3].color,
+                      child: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..translate(slideX, 0)
+                            ..scale(scale),
+                          child: mountains[index % 3]),
+                    ),
                   ),
                   Opacity(
                     opacity: opacities[0],
