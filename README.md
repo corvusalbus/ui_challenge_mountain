@@ -1,16 +1,15 @@
 # ui_challenge_mountain
 
-A new Flutter project.
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a exercise for making UI in flutter
 
-A few resources to get you started if this is your first Flutter project:
+I found some design and try to implement it in flutter.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+There is source of design: https://pl.pinterest.com/pin/473229873339981775/
+And other resource:
+    https://pl.wikipedia.org/wiki/Mount_Everest#/media/Plik:Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg
+    https://pl.wikipedia.org/wiki/K2#/media/Plik:K2,_Mount_Godwin_Austen,_Chogori,_Savage_Mountain.jpg
+    https://pl.wikipedia.org/wiki/Fud%C5%BCi#/media/Plik:FujiSunriseKawaguchiko2025WP.jpg
