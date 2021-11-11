@@ -33,23 +33,29 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late AnimationController animationController;
-  //late AnimationController reverseController;
-
+  late AnimationController reverseController;
+  double minOpacity = 0.7;
   @override
   void initState() {
     super.initState();
 
-    // reverseController =
-    //     AnimationController(vsync: this, duration: Duration(milliseconds: 250));
-    // reverseController.addListener(() => setState(() {}));
+    reverseController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 250));
+    reverseController.addListener(() => setState(() {
+          frontOpacity = (reverseController.value);
+          if (reverseController.isCompleted) {
+            index -= 1;
+            reverseController.reset();
+          }
+        }));
 
     animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 250));
     animationController.addListener(() => setState(() {
-          opacities[0] = 1 - animationController.value;
-          if (animationController.value == 1) {
-            animationController.value = 0;
+          opacities[0] = (1 - animationController.value);
+          if (animationController.isCompleted) {
             index += 1;
+            animationController.reset();
           }
         }));
 
@@ -60,8 +66,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ? animationController.forward()
       : animationController.reverse();
 
-  var opacities = [1.0, 1.0, 1.0];
-
+  var opacities = [0.7, 0.7, 0.7];
+  var frontOpacity = 0.0;
   var everest = Mountain(
     scale: 3.0,
     translateX: -40.0,
@@ -95,6 +101,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     var slideX = maxSlide * animationController.value;
     var scale = maxScale * animationController.value + 1.0;
 
+    var reverseSlideX = maxSlide * (reverseController.value);
+    var reverseScale = 1 + maxScale * (1 - reverseController.value);
     return GestureDetector(
       //onTap: toggle,
       onHorizontalDragUpdate: _handleDragUpdate,
@@ -106,49 +114,60 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               body: Stack(
                 children: [
                   Opacity(
-                    opacity: opacities[2],
+                    opacity: 1,
                     child: Container(
-                        color: mountains[(2 + index) % 3].color,
+                        color: mountains[(2 + index) % 3]
+                            .color
+                            .withOpacity(minOpacity),
                         child: Transform(
                             alignment: Alignment.center,
                             transform: Matrix4.identity()
-                              ..translate(slideX + -2 * maxSlide, 0)
+                              ..translate(
+                                  slideX - reverseSlideX + -2 * maxSlide, 0)
                               ..scale(1.0),
                             child: mountains[(2 + index) % 3])),
                   ),
                   Opacity(
-                    opacity: opacities[1],
+                    opacity: 1,
                     child: Container(
-                        color: mountains[(1 + index) % 3].color,
+                        color: mountains[(1 + index) % 3]
+                            .color
+                            .withOpacity(opacities[1]),
                         child: Transform(
                             alignment: Alignment.center,
                             transform: Matrix4.identity()
-                              ..translate(slideX - maxSlide, 0)
+                              ..translate(slideX - reverseSlideX - maxSlide, 0)
                               ..scale(1.0),
                             child: mountains[(1 + index) % 3])),
                   ),
                   Opacity(
                     opacity: opacities[0],
                     child: Container(
-                      color: mountains[index % 3].color,
+                      color: mountains[index % 3]
+                          .color
+                          .withOpacity(opacities[0] * minOpacity),
                       child: Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()
-                            ..translate(slideX, 0)
+                            ..translate(slideX - reverseSlideX, 0)
                             ..scale(scale),
                           child: mountains[index % 3]),
                     ),
                   ),
+
+                  //onebackelement
                   Opacity(
-                    opacity: opacities[0],
+                    opacity: frontOpacity,
                     child: Container(
-                      color: mountains[index % 3].color,
+                      color: mountains[(index - 1) % 3]
+                          .color
+                          .withOpacity(frontOpacity * minOpacity),
                       child: Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()
-                            ..translate(slideX, 0)
-                            ..scale(scale),
-                          child: mountains[index % 3]),
+                            ..translate(maxSlide - reverseSlideX, 0)
+                            ..scale(reverseScale),
+                          child: mountains[(index - 1) % 3]),
                     ),
                   ),
                 ],
@@ -161,9 +180,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void _handleDragUpdate(DragUpdateDetails details) {
     if (details.primaryDelta != null) {
       //print(details.primaryDelta);
-      animationController.value -= details.primaryDelta! / 300;
-      //reverseController.value = 1 - animationController.value;
 
+      //reverseController.value = 1 - animationController.value;
+      if ((animationController.value == 0 && reverseController.value > 0.0) ||
+          (animationController.value == 0.0 &&
+              reverseController.value == 0.0 &&
+              details.primaryDelta! > 0.0)) {
+        print(
+            'object ${details.primaryDelta}  ${animationController.value} ${reverseController.value}');
+        reverseController.value += details.primaryDelta! / 250;
+      }
+      if ((reverseController.value == 0.0 && animationController.value > 0.0) ||
+          (animationController.value == 0.0 &&
+              reverseController.value == 0.0 &&
+              details.primaryDelta! < 0.0)) {
+        print('siema ${details.primaryDelta}');
+        animationController.value -= details.primaryDelta! / 250;
+      }
     }
   }
 
@@ -177,10 +210,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void _handleDragEnd(DragEndDetails details) {
 //    if (animationController.isAnimating ||
     //      animationController.status == AnimationStatus.completed) return;
-    if (animationController.value > 0.5)
+    if (animationController.value > 0.5 && animationController.value > 0.0)
       animationController.forward();
     else
       animationController.reverse();
+    if (reverseController.value > 0.5 && reverseController.value > 0.0)
+      reverseController.forward();
+    else
+      reverseController.reverse();
   }
 }
 
