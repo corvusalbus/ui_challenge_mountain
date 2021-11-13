@@ -113,63 +113,39 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             return Scaffold(
               body: Stack(
                 children: [
-                  Opacity(
-                    opacity: 1,
-                    child: Container(
-                        color: mountains[(2 + index) % 3]
-                            .color
-                            .withOpacity(minOpacity),
-                        child: Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..translate(
-                                  slideX - reverseSlideX + -2 * maxSlide, 0)
-                              ..scale(1.0),
-                            child: mountains[(2 + index) % 3])),
-                  ),
-                  Opacity(
-                    opacity: 1,
-                    child: Container(
-                        color: mountains[(1 + index) % 3]
-                            .color
-                            .withOpacity(opacities[1]),
-                        child: Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..translate(slideX - reverseSlideX - maxSlide, 0)
-                              ..scale(1.0),
-                            child: mountains[(1 + index) % 3])),
-                  ),
-                  Opacity(
-                    opacity: opacities[0],
-                    child: Container(
-                      color: mountains[index % 3]
+                  MountainCard(
+                      opacity: 1,
+                      backgroundColor: mountains[(2 + index) % 3]
+                          .color
+                          .withOpacity(minOpacity),
+                      slideX: slideX - reverseSlideX + -2 * maxSlide,
+                      scale: 1.0,
+                      mountain: mountains[(2 + index) % 3]),
+                  MountainCard(
+                      opacity: 1,
+                      backgroundColor: mountains[(1 + index) % 3]
+                          .color
+                          .withOpacity(opacities[1]),
+                      slideX: slideX - reverseSlideX - maxSlide,
+                      scale: 1.0,
+                      mountain: mountains[(1 + index) % 3]),
+                  MountainCard(
+                      opacity: opacities[0],
+                      backgroundColor: mountains[index % 3]
                           .color
                           .withOpacity(opacities[0] * minOpacity),
-                      child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..translate(slideX - reverseSlideX, 0)
-                            ..scale(scale),
-                          child: mountains[index % 3]),
-                    ),
-                  ),
-
+                      slideX: slideX - reverseSlideX,
+                      scale: scale,
+                      mountain: mountains[index % 3]),
                   //onebackelement
-                  Opacity(
-                    opacity: frontOpacity,
-                    child: Container(
-                      color: mountains[(index - 1) % 3]
+                  MountainCard(
+                      opacity: frontOpacity,
+                      backgroundColor: mountains[(index - 1) % 3]
                           .color
                           .withOpacity(frontOpacity * minOpacity),
-                      child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..translate(maxSlide - reverseSlideX, 0)
-                            ..scale(reverseScale),
-                          child: mountains[(index - 1) % 3]),
-                    ),
-                  ),
+                      slideX: maxSlide - reverseSlideX,
+                      scale: reverseScale,
+                      mountain: mountains[(index - 1) % 3])
                 ],
               ),
             );
@@ -186,15 +162,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           (animationController.value == 0.0 &&
               reverseController.value == 0.0 &&
               details.primaryDelta! > 0.0)) {
-        print(
-            'object ${details.primaryDelta}  ${animationController.value} ${reverseController.value}');
         reverseController.value += details.primaryDelta! / 250;
       }
       if ((reverseController.value == 0.0 && animationController.value > 0.0) ||
           (animationController.value == 0.0 &&
               reverseController.value == 0.0 &&
               details.primaryDelta! < 0.0)) {
-        print('siema ${details.primaryDelta}');
         animationController.value -= details.primaryDelta! / 250;
       }
     }
@@ -248,6 +221,39 @@ class Mountain extends StatelessWidget {
               ..translate(translateX, translateY),
             child: Image(image: AssetImage(name))),
       ],
+    );
+  }
+}
+
+class MountainCard extends StatelessWidget {
+  final double opacity;
+  final Color backgroundColor;
+  final double slideX;
+  final double scale;
+  final Mountain mountain;
+  const MountainCard(
+      {Key? key,
+      required this.opacity,
+      required this.backgroundColor,
+      required this.slideX,
+      required this.scale,
+      required this.mountain})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        color: backgroundColor,
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..translate(slideX, 0)
+            ..scale(scale),
+          child: mountain,
+        ),
+      ),
     );
   }
 }
